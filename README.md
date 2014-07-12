@@ -4,6 +4,8 @@ This is a minimal Go implementation of the Puppet Forge v3 API without external 
 No database is required, metadata is stored on disk.
 
 ### Installation
+Pre-built binaries [here](http://mumble.ifup.se/go-puppet-forge/)
+
 Requires GNU tar
 
 Modules should be stored in `/var/lib/go-puppet-forge/modules`
