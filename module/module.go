@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 )
 
 type Dependencies struct {
@@ -64,6 +65,7 @@ func ListModules(path string) []string {
 			ExtractMetadata(file, path)
 		}
 	}
+	sort.Sort(sort.Reverse(sort.StringSlice(result)))
 	return result
 }
 
