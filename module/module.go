@@ -56,7 +56,7 @@ func ListModules(path string) []string {
 	var result []string
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".tar.gz") {
@@ -84,7 +84,7 @@ func ExtractMetadata(module os.FileInfo, path string) {
 	// TODO: Use built in gzip library.
 	metadata, err := exec.Command("tar", "-z", "-x", "--wildcards", "-O", "-f", filePath, "*/metadata.json").Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Failed to extract ", filePath)
 	}
 	ioutil.WriteFile(metadata_path, []byte(metadata), 0644)
 }
