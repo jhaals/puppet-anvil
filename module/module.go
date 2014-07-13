@@ -10,8 +10,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"sort"
+	"strings"
 )
 
 type Dependencies struct {
@@ -59,8 +59,7 @@ func ListModules(path string) []string {
 		log.Fatal(err)
 	}
 	for _, file := range files {
-		match, _ := regexp.MatchString(".tar.gz$", file.Name())
-		if match {
+		if strings.HasSuffix(file.Name(), ".tar.gz") {
 			result = append(result, filepath.Join(path, file.Name()))
 			ExtractMetadata(file, path)
 		}
