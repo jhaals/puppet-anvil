@@ -21,7 +21,7 @@ func main() {
 func ReleaseHandler(w http.ResponseWriter, r *http.Request) {
 	moduleDir := "/var/lib/go-puppet-forge/modules/"
 	moduleName := r.URL.Query().Get("module")
-	if moduleName == "" {
+	if !strings.Contains(moduleName, "-") {
 		http.Error(w, "request must be /v3/releases?module=user-module", 400)
 		return
 	}
