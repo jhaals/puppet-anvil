@@ -8,21 +8,26 @@ Pre-built binaries [here](http://dl.bintray.com/jhaals/generic/go-puppet-forge/)
 
 Requires GNU tar
 
-Modules should be stored in `/var/lib/go-puppet-forge/modules`
-with the following directory structure `user/module/user-module-version.tar.gz`
+Port and module directory is configured via environment variables.
 
-go-puppet-forge is listening on port 8080
-
+Modules must be stored in the following directory structure `user/module/user-module-version.tar.gz`
 example:
 
     /var/lib/go-puppet-forge/modules/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
 
-#### Usage
+__Running go-puppet-forge__
+
+    $ export MODULEPATH=/var/lib/go-puppet-forge/modules
+    $ export PORT=8080
+    $ ./go-puppet-forge
+    Starting go-puppet-forge on port 8080 serving modules from /var/lib/go-puppet-forge/modules
+
+#### Usage with Puppet
 A custom module_repository can be specified in the puppet config file.
 
     module_repository=http://my-forge.com/
 
-Or specified directly install command
+Or directly on command line
 
     ~ puppet module install puppetlabs/apache --module_repository http://127.0.0.1:8080 --modulepath modules
     Notice: Preparing to install into /Users/jhaals/modules ...
