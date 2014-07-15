@@ -39,7 +39,7 @@ func ReleaseHandler(w http.ResponseWriter, r *http.Request) {
 	response.Pagination = module.Pagination{Next: false}
 
 	for _, file := range modules {
-		metadata, _ := module.ReadMetadata(file + ".metadata")
+		metadata := module.ReadMetadata(file + ".metadata")
 		var result = module.Result{
 			Uri:     fmt.Sprintf("/v3/release/%s/%s", metadata.Name, metadata.Version),
 			Version: metadata.Version,

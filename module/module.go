@@ -3,7 +3,6 @@ package module
 import (
 	"crypto/md5"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -89,12 +88,13 @@ func ExtractMetadata(module os.FileInfo, path string) {
 	ioutil.WriteFile(metadata_path, []byte(metadata), 0644)
 }
 
-func ReadMetadata(file string) (Metadata, error) {
+func ReadMetadata(file string) Metadata {
 	var m Metadata
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return m, errors.New("Failed to read " + file)
+		log.Println(err)
+		return m
 	}
 	json.Unmarshal(data, &m)
-	return m, nil
+	return m
 }
