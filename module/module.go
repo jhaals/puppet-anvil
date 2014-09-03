@@ -1,13 +1,16 @@
 package module
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -71,21 +74,61 @@ func ListModules(path string) []string {
 func ExtractMetadata(module os.FileInfo, path string) {
 	filePath := filepath.Join(path, module.Name())
 	metadata_path := filepath.Join(path, module.Name()+".metadata")
-
 	metadataFile, err := os.Stat(metadata_path)
+
 	if err == nil {
 		if metadataFile.ModTime().After(module.ModTime()) {
 			// Fresh metadata, skipping
 			return
 		}
 	}
-	// Must be GNU tar
-	// TODO: Use built in gzip library.
-	metadata, err := exec.Command("tar", "-z", "-x", "--wildcards", "-O", "-f", filePath, "*/metadata.json").Output()
+	log.Println("Extracting metadata.json from", filePath)
+	fi, err := os.Open(filePath)
 	if err != nil {
-		log.Println("Failed to extract ", filePath)
+		log.Println(err)
+		return
 	}
-	ioutil.WriteFile(metadata_path, []byte(metadata), 0644)
+	defer fi.Close()
+
+	fz, err := gzip.NewReader(fi)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer fz.Close()
+
+	// tar.gz data
+	s, err := ioutil.ReadAll(fz)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	// TODO Prettify this thing...
+	r := bytes.NewReader(s)
+	tr := tar.NewReader(r)
+
+	// Iterate through the files in the archive.
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			// end of tar archive
+			break
+		}
+		if err != nil {
+			log.Println(err)
+			break
+		}
+		if strings.Contains(hdr.Name, "metadata.json") {
+			log.Println("Extracting", hdr.Name)
+			f, err := os.Create(metadata_path)
+			defer f.Close()
+			if err != nil {
+				log.Println(err)
+			}
+			io.Copy(f, tr)
+			break
+		}
+	}
 }
 
 func ReadMetadata(file string) Metadata {

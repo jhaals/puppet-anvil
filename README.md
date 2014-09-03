@@ -6,10 +6,6 @@ No database is required, metadata is stored on disk.
 ### Installation
 Pre-built binaries [here](http://dl.bintray.com/jhaals/generic/go-puppet-forge/)
 
-Requires GNU tar
-
-Port and module directory is configured via environment variables.
-
 Modules must be stored in the following directory structure `user/module/user-module-version.tar.gz`
 example:
 
