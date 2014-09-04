@@ -58,7 +58,7 @@ func ReleaseHandler(w http.ResponseWriter, r *http.Request, modulePath string) {
 			Uri:     fmt.Sprintf("/v3/release/%s/%s", metadata.Name, metadata.Version),
 			Version: metadata.Version,
 			FileUri: fmt.Sprintf("/v3/files/%s/%s/%s-%s.tar.gz", user, mod, moduleName, metadata.Version),
-			Md5:     module.Checksum(file)}
+			Md5:     Checksum(file)}
 		result.Metadata = metadata
 		response.Results = append(response.Results, result)
 	}

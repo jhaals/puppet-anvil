@@ -4,9 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"crypto/md5"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -44,15 +42,6 @@ type Response struct {
 	Pagination `json:"pagination"`
 }
 
-// Checksum file
-func Checksum(file string) string {
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return fmt.Sprintf("%x", md5.Sum(data))
-}
-
 // ListModules returns all tar.gz files
 func ListModules(path string) []string {
 	var result []string
@@ -72,9 +61,9 @@ func ListModules(path string) []string {
 
 //Extract metadata from module
 func ExtractMetadata(module os.FileInfo, path string) {
-	filePath := filepath.Join(path, module.Name())
-	metadata_path := filepath.Join(path, module.Name()+".metadata")
-	metadataFile, err := os.Stat(metadata_path)
+	moduleFile := filepath.Join(path, module.Name())
+	metadataPath := filepath.Join(path, module.Name()+".metadata")
+	metadataFile, err := os.Stat(metadataPath)
 
 	if err == nil {
 		if metadataFile.ModTime().After(module.ModTime()) {
@@ -82,8 +71,8 @@ func ExtractMetadata(module os.FileInfo, path string) {
 			return
 		}
 	}
-	log.Println("Extracting metadata.json from", filePath)
-	fi, err := os.Open(filePath)
+	log.Println("Extracting metadata.json from", moduleFile)
+	fi, err := os.Open(moduleFile)
 	if err != nil {
 		log.Println(err)
 		return
@@ -118,9 +107,9 @@ func ExtractMetadata(module os.FileInfo, path string) {
 			log.Println(err)
 			break
 		}
-		if strings.Contains(hdr.Name, "metadata.json") {
-			log.Println("Extracting", hdr.Name)
-			f, err := os.Create(metadata_path)
+		// Found metadata.json, no need to read any further.
+		if hdr.Name == strings.TrimRight(module.Name(), "tar.gz")+"/metadata.json" {
+			f, err := os.Create(metadataPath)
 			defer f.Close()
 			if err != nil {
 				log.Println(err)
