@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -51,8 +52,12 @@ func ListModules(path string) []string {
 	}
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".tar.gz") {
+			err := ExtractMetadata(file, path)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
 			result = append(result, filepath.Join(path, file.Name()))
-			ExtractMetadata(file, path)
 		}
 	}
 	sort.Sort(sort.Reverse(sort.StringSlice(result)))
@@ -60,7 +65,7 @@ func ListModules(path string) []string {
 }
 
 //Extract metadata from module
-func ExtractMetadata(module os.FileInfo, path string) {
+func ExtractMetadata(module os.FileInfo, path string) error {
 	moduleFile := filepath.Join(path, module.Name())
 	metadataPath := filepath.Join(path, module.Name()+".metadata")
 	metadataFile, err := os.Stat(metadataPath)
@@ -68,29 +73,25 @@ func ExtractMetadata(module os.FileInfo, path string) {
 	if err == nil {
 		if metadataFile.ModTime().After(module.ModTime()) {
 			// Fresh metadata, skipping
-			return
+			return nil
 		}
 	}
 	log.Println("Extracting metadata.json from", moduleFile)
 	fi, err := os.Open(moduleFile)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	defer fi.Close()
-
 	fz, err := gzip.NewReader(fi)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	defer fz.Close()
 
 	// tar.gz data
 	s, err := ioutil.ReadAll(fz)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	// TODO Prettify this thing...
 	r := bytes.NewReader(s)
@@ -100,22 +101,20 @@ func ExtractMetadata(module os.FileInfo, path string) {
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
-			// end of tar archive
-			break
+			return errors.New("metadata.json not found in " + module.Name())
 		}
 		if err != nil {
-			log.Println(err)
-			break
+			return err
 		}
 		// Found metadata.json, no need to read any further.
 		if hdr.Name == strings.TrimRight(module.Name(), "tar.gz")+"/metadata.json" {
 			f, err := os.Create(metadataPath)
 			defer f.Close()
 			if err != nil {
-				log.Println(err)
+				return err
 			}
 			io.Copy(f, tr)
-			break
+			return nil
 		}
 	}
 }
