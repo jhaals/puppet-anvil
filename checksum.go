@@ -4,14 +4,13 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io/ioutil"
-	"log"
 )
 
 // Checksum file
-func Checksum(file string) string {
+func Checksum(file string) (string, error) {
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
-	return fmt.Sprintf("%x", md5.Sum(data))
+	return fmt.Sprintf("%x", md5.Sum(data)), nil
 }

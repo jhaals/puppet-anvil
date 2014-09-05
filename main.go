@@ -52,11 +52,17 @@ func ReleaseHandler(w http.ResponseWriter, r *http.Request, modulePath string) {
 	response.Pagination = Pagination{Next: false}
 
 	for _, metadata := range modules {
+		checksum, err := Checksum(filepath.Join(modulePath, user, mod, moduleName+"-"+metadata.Version+".tar.gz"))
+		if err != nil {
+			// Unable to checksum modulefile, log and skip.
+			log.Println(err)
+			continue
+		}
 		var result = Result{
 			Uri:     fmt.Sprintf("/v3/release/%s/%s", metadata.Name, metadata.Version),
 			Version: metadata.Version,
 			FileUri: fmt.Sprintf("/v3/files/%s/%s/%s-%s.tar.gz", user, mod, moduleName, metadata.Version),
-			Md5:     Checksum(filepath.Join(modulePath, user, mod, moduleName+"-"+metadata.Version+".tar.gz"))}
+			Md5:     checksum}
 		result.Metadata = metadata
 		response.Results = append(response.Results, result)
 	}
