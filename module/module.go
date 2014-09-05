@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
@@ -44,8 +43,8 @@ type Response struct {
 }
 
 // ListModules returns all tar.gz files
-func ListModules(path string) []string {
-	var result []string
+func ListModules(path string) []Metadata {
+	var result []Metadata
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Println(err)
@@ -57,10 +56,14 @@ func ListModules(path string) []string {
 				log.Println(err)
 				continue
 			}
-			result = append(result, filepath.Join(path, file.Name()))
+			metadata, err := readMetadata(filepath.Join(path, file.Name()+".metadata"))
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			result = append(result, metadata)
 		}
 	}
-	sort.Sort(sort.Reverse(sort.StringSlice(result)))
 	return result
 }
 
@@ -101,7 +104,7 @@ func ExtractMetadata(module os.FileInfo, path string) error {
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
-			return errors.New("metadata.json not found in " + module.Name())
+			return errors.New("metadata.json not found in " + moduleFile)
 		}
 		if err != nil {
 			return err
@@ -119,13 +122,12 @@ func ExtractMetadata(module os.FileInfo, path string) error {
 	}
 }
 
-func ReadMetadata(file string) Metadata {
+func readMetadata(file string) (Metadata, error) {
 	var m Metadata
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Println(err)
-		return m
+		return m, err
 	}
 	json.Unmarshal(data, &m)
-	return m
+	return m, nil
 }

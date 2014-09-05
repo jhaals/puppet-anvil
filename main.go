@@ -52,13 +52,12 @@ func ReleaseHandler(w http.ResponseWriter, r *http.Request, modulePath string) {
 	response := new(module.Response)
 	response.Pagination = module.Pagination{Next: false}
 
-	for _, file := range modules {
-		metadata := module.ReadMetadata(file + ".metadata")
+	for _, metadata := range modules {
 		var result = module.Result{
 			Uri:     fmt.Sprintf("/v3/release/%s/%s", metadata.Name, metadata.Version),
 			Version: metadata.Version,
 			FileUri: fmt.Sprintf("/v3/files/%s/%s/%s-%s.tar.gz", user, mod, moduleName, metadata.Version),
-			Md5:     Checksum(file)}
+			Md5:     Checksum(filepath.Join(modulePath, user, mod, moduleName+"-"+metadata.Version+".tar.gz"))}
 		result.Metadata = metadata
 		response.Results = append(response.Results, result)
 	}
