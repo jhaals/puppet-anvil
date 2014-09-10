@@ -5,6 +5,7 @@ fi
 
 if ! getent passwd forge 1> /dev/null; then
     adduser --quiet \
+            --shell /bin/bash \
             --system \
             --ingroup forge \
             --home /var/lib/go-puppet-forge \
