@@ -7,7 +7,7 @@ if ! getent passwd forge 1> /dev/null; then
     adduser --quiet \
             --system \
             --ingroup forge \
-            --no-create-home \
+            --home /var/lib/go-puppet-forge \
             --disabled-password \
             forge
 fi
