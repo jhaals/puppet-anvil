@@ -15,8 +15,8 @@ import (
 )
 
 type Dependencies struct {
-	Name         string `json:"name"`
-	VersionRange string `json:"version_requirement"`
+	Name               string `json:"name"`
+	VersionRequirement string `json:"version_requirement,omitempty"`
 }
 
 type Metadata struct {
