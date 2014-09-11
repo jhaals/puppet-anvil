@@ -11,6 +11,8 @@ example:
 
     /var/lib/go-puppet-forge/modules/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
 
+You can create a .deb package for Ubuntu using `make deb`. fpm is required to create the package.
+
 __Running go-puppet-forge__
 
     $ export MODULEPATH=/var/lib/go-puppet-forge/modules
