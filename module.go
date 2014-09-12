@@ -14,17 +14,15 @@ import (
 	"strings"
 )
 
-type Dependencies struct {
-	Name               string `json:"name"`
-	VersionRequirement string `json:"version_requirement,omitempty"`
-}
-
 type Metadata struct {
-	Name         string         `json:"name"`
-	Version      string         `json:"version"`
-	Author       string         `json:"author"`
-	Licence      string         `json:"license"`
-	Dependencies []Dependencies `json:"dependencies"`
+	Name         string `json:"name"`
+	Version      string `json:"version"`
+	Author       string `json:"author"`
+	Licence      string `json:"license"`
+	Dependencies []struct {
+		Name               string `json:"name"`
+		VersionRequirement string `json:"version_requirement,omitempty"`
+	} `json:"dependencies"`
 }
 
 type Result struct {
