@@ -1,23 +1,28 @@
 # Puppet Anvil
 
-This is a minimal Go implementation of the Puppet Forge v3 API without external libraries. This project is inspired by [simple-puppet-forge](https://github.com/dalen/simple-puppet-forge).
-No database is required, metadata is stored on disk.
+Puppet Anvil is a minimal implementation of the Puppet Forge and does not require any database.
+Puppet modules can then be downloaded using the [Puppet module tool](https://docs.puppetlabs.com/puppet/latest/reference/modules_installing.html#installing-from-another-module-repository) or [librarian-puppet](http://librarian-puppet.com/)
 
-### Installation
+### Run in Docker Container
+Pull container `docker pull jhaals/puppet-anvil`
+
+Serve modules on port 8080 from /var/lib/modules
+
+    docker run -v /var/lib/modules:/modules -p 8080:8080 jhaals/puppet-anvil
 
 Modules must be stored in the following directory structure `user/module/user-module-version.tar.gz`
 example:
 
-    /var/lib/puppet-anvil/modules/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
+    /yourmoduledir/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
 
-You can create a .deb package for Ubuntu using `make deb`. fpm is required to create the package.
+##### Build and run from source
 
-__Running Puppet Anvil__
+    go build -o puppet-anvil
+    PORT=1337 MODULEPATH=/var/lib/puppet-anvil/modules ./puppet-anvil
 
-    $ export MODULEPATH=/var/lib/puppet-anvil/modules
-    $ export PORT=8080
-    $ ./puppet-anvil
-    Starting Puppet Anvil on port 8080 serving modules from /var/lib/puppet-anvil/modules
+    Starting Puppet Anvil on port 1337 serving modules from /var/lib/puppet-anvil/modules
+
+_You can create a .deb package for Ubuntu using `make deb`. the fpm gem is required._
 
 #### Usage with Puppet
 A custom module_repository can be specified in the puppet config file.
@@ -35,3 +40,5 @@ Or directly on command line
     └─┬ puppetlabs-apache (v1.1.0)
       ├── puppetlabs-concat (v1.1.0)
       └── puppetlabs-stdlib (v4.2.2)
+
+This project is inspired by [simple-puppet-forge](https://github.com/dalen/simple-puppet-forge)
