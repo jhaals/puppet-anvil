@@ -8,7 +8,7 @@ if ! getent passwd forge 1> /dev/null; then
             --shell /bin/bash \
             --system \
             --ingroup forge \
-            --home /var/lib/go-puppet-forge \
+            --home /var/lib/puppet-anvil \
             --disabled-password \
             forge
 fi

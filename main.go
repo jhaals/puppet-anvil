@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("Missing MODULEPATH environment variable")
 	}
 
-	log.Println("Starting go-puppet-forge on port", port, "serving modules from", modulePath)
+	log.Println("Starting Puppet Anvil on port", port, "serving modules from", modulePath)
 
 	http.HandleFunc("/v3/files/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(modulePath, r.URL.Path[10:]))

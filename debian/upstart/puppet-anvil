@@ -7,7 +7,7 @@ respawn
 respawn limit 15 5
 
 env PORT=8080
-env MODULEPATH=/var/lib/go-puppet-forge/modules
+env MODULEPATH=/var/lib/puppet-anvil/modules
 script
-  /usr/bin/go-puppet-forge
+  /usr/bin/puppet-anvil
 end script

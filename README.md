@@ -1,24 +1,23 @@
-# go-puppet-forge
+# Puppet Anvil
 
 This is a minimal Go implementation of the Puppet Forge v3 API without external libraries. This project is inspired by [simple-puppet-forge](https://github.com/dalen/simple-puppet-forge).
 No database is required, metadata is stored on disk.
 
 ### Installation
-Pre-built binaries [here](http://dl.bintray.com/jhaals/generic/go-puppet-forge/)
 
 Modules must be stored in the following directory structure `user/module/user-module-version.tar.gz`
 example:
 
-    /var/lib/go-puppet-forge/modules/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
+    /var/lib/puppet-anvil/modules/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
 
 You can create a .deb package for Ubuntu using `make deb`. fpm is required to create the package.
 
-__Running go-puppet-forge__
+__Running Puppet Anvil__
 
-    $ export MODULEPATH=/var/lib/go-puppet-forge/modules
+    $ export MODULEPATH=/var/lib/puppet-anvil/modules
     $ export PORT=8080
-    $ ./go-puppet-forge
-    Starting go-puppet-forge on port 8080 serving modules from /var/lib/go-puppet-forge/modules
+    $ ./puppet-anvil
+    Starting Puppet Anvil on port 8080 serving modules from /var/lib/puppet-anvil/modules
 
 #### Usage with Puppet
 A custom module_repository can be specified in the puppet config file.
