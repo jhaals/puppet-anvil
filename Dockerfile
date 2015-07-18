@@ -1,11 +1,6 @@
-FROM ubuntu
-MAINTAINER Johan Haals <johan@haals.se>
+FROM benschw/litefs
 
-RUN apt-get update
-RUN apt-get install -y golang
-
-ADD . /source
-RUN cd /source && go build -o /puppet-anvil
+ADD ./puppet-anvil /puppet-anvil
 
 ENV MODULEPATH /modules
 ENV PORT 8080

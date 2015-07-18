@@ -1,2 +1,6 @@
 *.deb
 /go-puppet-forge
+
+modules
+out
+puppet-anvil
