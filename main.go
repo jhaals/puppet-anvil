@@ -3,11 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/benschw/opin-go/rest"
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -23,13 +27,51 @@ func main() {
 
 	log.Println("Starting Puppet Anvil on port", port, "serving modules from", modulePath)
 
-	http.HandleFunc("/v3/files/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(modulePath, r.URL.Path[10:]))
-	})
-	http.HandleFunc("/v3/releases", func(w http.ResponseWriter, r *http.Request) {
+	mr := mux.NewRouter()
+	mr.HandleFunc("/v3/files/{user}/{module}/{fileName}", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("files")
+
+		user, _ := rest.PathString(r, "user")
+		module, _ := rest.PathString(r, "module")
+		fileName, _ := rest.PathString(r, "fileName")
+
+		http.ServeFile(w, r, filepath.Join(modulePath, user, module, fileName))
+	}).Methods("GET")
+
+	mr.HandleFunc("/v3/releases", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("releases")
 		ReleaseHandler(w, r, modulePath)
-	})
+	}).Methods("GET")
+
+	mr.HandleFunc("/modules/{user}/{module}/{fileName}", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("upload")
+		upsertFile(w, r)
+	}).Methods("PUT")
+
+	http.Handle("/", mr)
+
 	http.ListenAndServe(":"+port, nil)
+}
+func upsertFile(w http.ResponseWriter, r *http.Request) {
+	content, _ := ioutil.ReadAll(r.Body)
+	user, _ := rest.PathString(r, "user")
+	module, _ := rest.PathString(r, "module")
+	fileName, _ := rest.PathString(r, "fileName")
+
+	modulePath := fmt.Sprintf("/modules/%s/%s", user, module)
+	if _, err := os.Stat(modulePath); err != nil {
+		os.MkdirAll(modulePath, 0755)
+	}
+
+	if err := ioutil.WriteFile(modulePath+"/"+fileName, content, 0666); err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	url := fmt.Sprintf("/v3/files/%s/%s/%s", user, module, fileName)
+
+	w.Header().Set("Location", url)
+	w.Header().Set("Content-Type", "application/json")
 }
 
 func ReleaseHandler(w http.ResponseWriter, r *http.Request, modulePath string) {
