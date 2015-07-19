@@ -34,7 +34,8 @@ func (s *AnvilService) Run() error {
 
 	http.Handle("/", mr)
 
-	return s.Server.Start()
+	err := s.Server.Start()
+	return err
 }
 
 func (s *AnvilService) Stop() {

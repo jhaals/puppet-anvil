@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/benschw/opin-go/rest"
+	"github.com/benschw/puppet-anvil/api"
 )
 
 type ForgeResource struct {
@@ -33,8 +34,8 @@ func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 
 	results, err := f.getResults(user, mod)
 
-	response := &Response{
-		Pagination: Pagination{
+	response := &api.Response{
+		Pagination: api.Pagination{
 			Next: false, // nil?
 		},
 		Results: results,
@@ -45,8 +46,8 @@ func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (f *ForgeResource) getResults(user string, mod string) ([]Result, error) {
-	results := make([]Result, 0)
+func (f *ForgeResource) getResults(user string, mod string) ([]api.Result, error) {
+	results := make([]api.Result, 0)
 
 	modules := ListModules(filepath.Join(f.ModulePath, user, mod))
 
@@ -60,14 +61,13 @@ func (f *ForgeResource) getResults(user string, mod string) ([]Result, error) {
 	return results, nil
 }
 
-func (f *ForgeResource) getResult(metadata Metadata, path string) (Result, error) {
+func (f *ForgeResource) getResult(metadata api.Metadata, path string) (api.Result, error) {
 	checksum, err := Checksum(filepath.Join(f.ModulePath, path))
 	if err != nil {
-
 		log.Println(err)
-		return Result{}, fmt.Errorf("not a module")
+		return api.Result{}, fmt.Errorf("not a module")
 	}
-	return Result{
+	return api.Result{
 		Uri:      fmt.Sprintf("/v3/release/%s/%s", metadata.Name, metadata.Version),
 		Version:  metadata.Version,
 		FileUri:  fmt.Sprintf("/v3/files/%s", path),
