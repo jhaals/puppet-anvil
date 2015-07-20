@@ -12,7 +12,7 @@ mkdir -p $ROOT_PATH/out $ROOT_PATH/modules/puppetlabs/apache $ROOT_PATH/modules/
 MODULEPATH=$ROOT_PATH/modules PORT=8080 ./build/puppet-anvil > /dev/null 2>&1  &
 PID=$!
 
-if [ ! -f ./test/puppetlabs-apache-1.5.0.tar.gz 2>&1 >/dev/null ]; then
+if [ ! -f $ROOT_PATH/puppetlabs-apache-1.5.0.tar.gz 2>&1 >/dev/null ]; then
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.5.0.tar.gz -O $ROOT_PATH/puppetlabs-apache-1.5.0.tar.gz >/dev/null
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.3.tar.gz -O $ROOT_PATH/puppetlabs-concat-1.2.3.tar.gz >/dev/null
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz -O $ROOT_PATH/puppetlabs-stdlib-4.6.0.tar.gz >/dev/null
