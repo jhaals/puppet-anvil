@@ -1,11 +1,11 @@
-package main
+package service
 
 import (
 	"testing"
 )
 
 func TestChecksum(t *testing.T) {
-	_, err := Checksum("main.go")
+	_, err := Checksum("checksum.go")
 	if err != nil {
 		t.Fatal(err)
 	}

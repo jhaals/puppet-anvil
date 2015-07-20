@@ -1,11 +1,10 @@
-package main
+package service
 
 import (
 	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
-	"strings"
 
 	"github.com/benschw/opin-go/rest"
 	"github.com/benschw/puppet-anvil/api"
@@ -16,9 +15,9 @@ type ForgeResource struct {
 }
 
 func (f *ForgeResource) GetModule(w http.ResponseWriter, r *http.Request) {
-	user, module, fileName, err := getModulePathComponents(r)
+	user, module, fileName, err := parseFileNamePathParam(r)
 	if err != nil {
-		rest.SetBadRequestResponse(w)
+		SetBadRequestResponse(w, err)
 		return
 	}
 
@@ -28,7 +27,7 @@ func (f *ForgeResource) GetModule(w http.ResponseWriter, r *http.Request) {
 func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 	user, mod, err := parseModuleGetParam(r)
 	if err != nil {
-		http.Error(w, "request must be /v3/releases?module=user-module", 400)
+		SetBadRequestResponse(w, err)
 		return
 	}
 
@@ -42,7 +41,7 @@ func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rest.SetOKResponse(w, response); err != nil {
-		rest.SetInternalServerErrorResponse(w, err)
+		SetInternalServerErrorResponse(w, err)
 	}
 }
 
@@ -74,16 +73,4 @@ func (f *ForgeResource) getResult(metadata api.Metadata, path string) (api.Resul
 		Md5:      checksum,
 		Metadata: metadata,
 	}, nil
-}
-
-func parseModuleGetParam(r *http.Request) (string, string, error) {
-	moduleName := r.URL.Query().Get("module")
-	if !strings.Contains(moduleName, "-") {
-		return "", "", fmt.Errorf("bad get param")
-	}
-
-	user := strings.Split(moduleName, "-")[0]
-	mod := strings.Split(moduleName, "-")[1]
-
-	return user, mod, nil
 }

@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/benschw/opin-go/rest"
 )
 
 type AdminResource struct {
@@ -16,9 +14,10 @@ type AdminResource struct {
 
 func (a *AdminResource) UpsertFile(w http.ResponseWriter, r *http.Request) {
 	content, _ := ioutil.ReadAll(r.Body)
-	user, module, fileName, err := getModulePathComponents(r)
+	user, module, fileName, err := parseFileNamePathParam(r)
+
 	if err != nil {
-		rest.SetBadRequestResponse(w)
+		SetBadRequestResponse(w, err)
 		return
 	}
 

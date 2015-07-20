@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+
+	"github.com/benschw/puppet-anvil/service"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 		log.Fatal("Missing MODULEPATH environment variable")
 	}
 
-	svc := NewAnvilService(port, modulePath)
+	svc := service.New(port, modulePath)
 
 	if err := svc.Run(); err != nil {
 		log.Print(err)
