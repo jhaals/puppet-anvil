@@ -1,7 +1,5 @@
 *.deb
 /go-puppet-forge
 
-modules
-out
-puppet-anvil
-test
+build
+tmp-test

@@ -46,12 +46,14 @@ type ComponentTestSuite struct {
 }
 
 func (s *ComponentTestSuite) SetUpSuite(c *C) {
-	s.path = "/tmp/anvil-modules"
+	s.path = "./tmp-test"
 
 	os.MkdirAll(s.path+"/modules", 0755)
-	dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.5.0.tar.gz", s.path+"/puppetlabs-apache-1.5.0.tar.gz")
-	dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.3.tar.gz", s.path+"/puppetlabs-concat-1.2.3.tar.gz")
-	dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz", s.path+"/puppetlabs-stdlib-4.6.0.tar.gz")
+	if _, err := os.Stat(s.path + "/puppetlabs-apache-1.5.0.tar.gz"); err != nil {
+		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.5.0.tar.gz", s.path+"/puppetlabs-apache-1.5.0.tar.gz")
+		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.3.tar.gz", s.path+"/puppetlabs-concat-1.2.3.tar.gz")
+		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz", s.path+"/puppetlabs-stdlib-4.6.0.tar.gz")
+	}
 
 	s.port = rando.Port()
 	s.svc = service.New(strconv.Itoa(s.port), s.path+"/modules")
@@ -61,7 +63,6 @@ func (s *ComponentTestSuite) SetUpSuite(c *C) {
 }
 func (s *ComponentTestSuite) TearDownSuite(c *C) {
 	s.svc.Stop()
-	os.RemoveAll(s.path)
 }
 func (s *ComponentTestSuite) TearDownTest(c *C) {
 	os.RemoveAll(s.path + "/modules")
