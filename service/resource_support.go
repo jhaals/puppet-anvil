@@ -5,14 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"log"
-
 	"github.com/gorilla/mux"
 )
 
 func parseFileNamePathParam(r *http.Request) (string, string, string, error) {
 	fileName := mux.Vars(r)["fileName"]
-	log.Printf("fn: " + fileName)
 	user, mod, err := parseFileName(fileName)
 	return user, mod, fileName, err
 }
