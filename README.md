@@ -3,26 +3,18 @@
 Puppet Anvil is a minimal implementation of the Puppet Forge and does not require any database.
 Puppet modules can then be downloaded using the [Puppet module tool](https://docs.puppetlabs.com/puppet/latest/reference/modules_installing.html#installing-from-another-module-repository) or [librarian-puppet](http://librarian-puppet.com/)
 
-### Run in Docker Container
-Pull container `docker pull jhaals/puppet-anvil`
 
-Serve modules on port 8080 from /var/lib/modules
+##### Build and run from source
 
-    docker run -v /var/lib/modules:/modules -p 8080:8080 jhaals/puppet-anvil
+    make build
+    PORT=1337 MODULEPATH=/var/lib/puppet-anvil/modules ./build/puppet-anvil
+
+    Starting Puppet Anvil on port 1337 serving modules from /var/lib/puppet-anvil/modules
 
 Modules must be stored in the following directory structure `user/module/user-module-version.tar.gz`
 example:
 
     /yourmoduledir/puppetlabs/apache/puppetlabs-apache-1.1.0.tar.gz
-
-##### Build and run from source
-
-    go build -o puppet-anvil
-    PORT=1337 MODULEPATH=/var/lib/puppet-anvil/modules ./puppet-anvil
-
-    Starting Puppet Anvil on port 1337 serving modules from /var/lib/puppet-anvil/modules
-
-_You can create a .deb package for Ubuntu using `make deb`. the fpm gem is required._
 
 #### Usage with Puppet
 A custom module_repository can be specified in the puppet config file.
@@ -42,3 +34,13 @@ Or directly on command line
       └── puppetlabs-stdlib (v4.2.2)
 
 This project is inspired by [simple-puppet-forge](https://github.com/dalen/simple-puppet-forge)
+
+#### Hacking
+
+	make deps
+	make test
+	make build
+	
+	# acceptance-test uses your installed copy of puppet to excercise the anvil server
+	make acceptance-test
+
