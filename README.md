@@ -48,10 +48,12 @@ There are two ways to manage your module artifacts:
 
 Manually land files in your module directory
 
-	cp puppetlabs-apache-1.5.0.tar.gz /var/lib/puppet-anvil/modules/puppetlabs/apache/puppetlabs-apache-1.5.0.tar.gz
+	cp puppetlabs-apache-1.5.0.tar.gz \
+		/var/lib/puppet-anvil/modules/puppetlabs/apache/puppetlabs-apache-1.5.0.tar.gz
 
 Use the supplied `admin/module` endpoint
 
-	curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-apache-1.5.0.tar.gz -T ./puppetlabs-apache-1.5.0.tar.gz
+	curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-apache-1.5.0.tar.gz \
+		-T ./puppetlabs-apache-1.5.0.tar.gz
 
 
