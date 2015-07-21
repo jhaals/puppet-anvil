@@ -31,7 +31,7 @@ else
 fi
 
 
-sudo rm -rf $ROOT_PATH/modules $ROOT_PATH/out
+rm -rf $ROOT_PATH/modules $ROOT_PATH/out
 
 kill $PID
 exit $RC

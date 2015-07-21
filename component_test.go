@@ -6,35 +6,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"testing"
 
-	"github.com/benschw/opin-go/rando"
 	"github.com/benschw/puppet-anvil/api"
 	"github.com/benschw/puppet-anvil/service"
 
 	. "gopkg.in/check.v1"
 )
-
-func dl(path string, outPath string) {
-	out, err := os.Create(outPath)
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-
-	resp, err := http.Get(path)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func Test(t *testing.T) { TestingT(t) }
 
 var _ = Suite(&ComponentTestSuite{})
 
@@ -55,14 +32,13 @@ func (s *ComponentTestSuite) SetUpSuite(c *C) {
 		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz", s.path+"/puppetlabs-stdlib-4.6.0.tar.gz")
 	}
 
-	s.port = rando.Port()
+	s.port = Port()
 	s.svc = service.New(strconv.Itoa(s.port), s.path+"/modules")
 	s.client = &api.AnvilClient{Address: fmt.Sprintf("localhost:%d", s.port)}
 
 	go s.svc.Run()
 }
 func (s *ComponentTestSuite) TearDownSuite(c *C) {
-	s.svc.Stop()
 }
 func (s *ComponentTestSuite) TearDownTest(c *C) {
 	os.RemoveAll(s.path + "/modules")

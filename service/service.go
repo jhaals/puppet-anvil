@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/benschw/opin-go/ophttp"
 	"github.com/benschw/puppet-anvil/api"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -15,13 +14,13 @@ import (
 
 func New(port string, modulePath string) *AnvilService {
 	return &AnvilService{
-		Server:     ophttp.NewServer(":" + port),
+		Bind:       ":" + port,
 		ModulePath: modulePath,
 	}
 }
 
 type AnvilService struct {
-	Server     *ophttp.Server
+	Bind       string
 	ModulePath string
 }
 
@@ -37,14 +36,8 @@ func (s *AnvilService) Run() error {
 	mr.HandleFunc("/admin/module/{fileName}", admin.UpsertFile).Methods("PUT")
 
 	http.Handle("/", handlers.LoggingHandler(os.Stdout, mr))
-	err := s.Server.Start()
-	log.Println(err)
-	return err
-}
 
-func (s *AnvilService) Stop() {
-	log.Println("Stopping Puppet Anvil")
-	s.Server.Stop()
+	return http.ListenAndServe(s.Bind, nil)
 }
 
 func SetOKResponse(w http.ResponseWriter, entity interface{}) error {

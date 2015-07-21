@@ -11,12 +11,14 @@ deps:
 test:
 	go test ./...
 
+test-all: test acceptance-test
+
 acceptance-test: build
 	./acceptance-test.sh
 
 build:
 	mkdir -p build
-	cd cli/server && go build -o ../../build/puppet-anvil
+	go build -o build/puppet-anvil
 
 .PHONY: build
 

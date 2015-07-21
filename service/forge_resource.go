@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/benschw/opin-go/rest"
 	"github.com/benschw/puppet-anvil/api"
 )
 
@@ -40,7 +39,7 @@ func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 		Results: results,
 	}
 
-	if err := rest.SetOKResponse(w, response); err != nil {
+	if err := SetOKResponse(w, response); err != nil {
 		SetInternalServerErrorResponse(w, err)
 	}
 }
