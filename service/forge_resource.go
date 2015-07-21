@@ -9,24 +9,28 @@ import (
 	"github.com/benschw/puppet-anvil/api"
 )
 
+// Handlers that implement the Forge API
+// https://forgeapi.puppetlabs.com/
 type ForgeResource struct {
 	ModulePath string
 }
 
+// Serve up module archive
 func (f *ForgeResource) GetModule(w http.ResponseWriter, r *http.Request) {
 	user, module, fileName, err := parseFileNamePathParam(r)
 	if err != nil {
-		SetBadRequestResponse(w, err)
+		setBadRequestResponse(w, err)
 		return
 	}
 
 	http.ServeFile(w, r, filepath.Join(f.ModulePath, user, module, fileName))
 }
 
+// Query releases, filter by user supplied module
 func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 	user, mod, err := parseModuleGetParam(r)
 	if err != nil {
-		SetBadRequestResponse(w, err)
+		setBadRequestResponse(w, err)
 		return
 	}
 
@@ -39,8 +43,8 @@ func (f *ForgeResource) GetReleases(w http.ResponseWriter, r *http.Request) {
 		Results: results,
 	}
 
-	if err := SetOKResponse(w, response); err != nil {
-		SetInternalServerErrorResponse(w, err)
+	if err := setOKResponse(w, response); err != nil {
+		setInternalServerErrorResponse(w, err)
 	}
 }
 

@@ -6,18 +6,22 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/benschw/puppet-anvil/api"
 )
 
+// Handlers to help manage private forge
 type AdminResource struct {
 	ModulePath string
 }
 
+// PUT a module archive
 func (a *AdminResource) UpsertFile(w http.ResponseWriter, r *http.Request) {
 	content, _ := ioutil.ReadAll(r.Body)
 	user, module, fileName, err := parseFileNamePathParam(r)
 
 	if err != nil {
-		SetBadRequestResponse(w, err)
+		setBadRequestResponse(w, err)
 		return
 	}
 
@@ -31,8 +35,11 @@ func (a *AdminResource) UpsertFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("/v3/files/%s/%s/%s", user, module, fileName)
+	modResp := &api.AdminModule{
+		FileUri: fmt.Sprintf("/v3/files/%s/%s/%s", user, module, fileName),
+	}
 
-	w.Header().Set("Location", url)
-	w.Header().Set("Content-Type", "application/json")
+	if err := setOKResponse(w, modResp); err != nil {
+		setInternalServerErrorResponse(w, err)
+	}
 }

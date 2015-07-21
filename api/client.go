@@ -9,10 +9,12 @@ import (
 	"strings"
 )
 
+// Client for interacting with AnvilService
 type AnvilClient struct {
 	Address string
 }
 
+// Publish a module artifact to the anvil repo
 func (c *AnvilClient) PublishModule(b io.Reader, fileName string) (string, error) {
 	url := fmt.Sprintf("http://%s/admin/module/%s", c.Address, fileName)
 
@@ -28,16 +30,19 @@ func (c *AnvilClient) PublishModule(b io.Reader, fileName string) (string, error
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-
+	if err != nil {
+		return "", nil
+	}
 	if resp.StatusCode != http.StatusOK {
 		return "", processErrors(body, resp.StatusCode)
 	}
-
-	location := resp.Header["Location"][0]
-	return location, nil
+	var adminMod *AdminModule
+	err = json.Unmarshal(body, &adminMod)
+	return adminMod.FileUri, err
 }
 
-func (c *AnvilClient) GetRelease(user string, module string) (*Response, error) {
+// query releases  filtered by specified module
+func (c *AnvilClient) GetReleaseByModule(user string, module string) (*Response, error) {
 	var entity *Response
 
 	url := fmt.Sprintf("http://%s/v3/releases?module=%s-%s", c.Address, user, module)
@@ -60,10 +65,8 @@ func (c *AnvilClient) GetRelease(user string, module string) (*Response, error) 
 	if resp.StatusCode != http.StatusOK {
 		return entity, processErrors(body, resp.StatusCode)
 	}
-	if err = json.Unmarshal(body, &entity); err != nil {
-		return entity, nil
-	}
-	return entity, nil
+	err = json.Unmarshal(body, &entity)
+	return entity, err
 }
 
 func processErrors(body []byte, code int) error {

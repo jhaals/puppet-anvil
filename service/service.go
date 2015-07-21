@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Create a new AnvilService
 func New(port string, modulePath string) *AnvilService {
 	return &AnvilService{
 		Bind:       ":" + port,
@@ -19,11 +20,13 @@ func New(port string, modulePath string) *AnvilService {
 	}
 }
 
+// Manage http server providing private Puppet Forge functionality
 type AnvilService struct {
 	Bind       string
 	ModulePath string
 }
 
+// Wire routing for http server and start it up
 func (s *AnvilService) Run() error {
 	log.Println("Starting Puppet Anvil")
 
@@ -40,10 +43,10 @@ func (s *AnvilService) Run() error {
 	return http.ListenAndServe(s.Bind, nil)
 }
 
-func SetOKResponse(w http.ResponseWriter, entity interface{}) error {
+func setOKResponse(w http.ResponseWriter, entity interface{}) error {
 	return setResponse(w, entity, http.StatusOK)
 }
-func SetBadRequestResponse(w http.ResponseWriter, e error) {
+func setBadRequestResponse(w http.ResponseWriter, e error) {
 	resp := api.NewErrorResponse(e)
 	err := setResponse(w, resp, http.StatusBadRequest)
 	if err != nil {
@@ -51,7 +54,7 @@ func SetBadRequestResponse(w http.ResponseWriter, e error) {
 		setResponse(w, nil, http.StatusBadRequest)
 	}
 }
-func SetInternalServerErrorResponse(w http.ResponseWriter, e error) {
+func setInternalServerErrorResponse(w http.ResponseWriter, e error) {
 	resp := api.NewErrorResponse(e)
 	err := setResponse(w, resp, http.StatusInternalServerError)
 	if err != nil {

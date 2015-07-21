@@ -22,6 +22,8 @@ type ComponentTestSuite struct {
 	port   int
 }
 
+// create and start a service, create a client
+// download fixture modules if they aren't present
 func (s *ComponentTestSuite) SetUpSuite(c *C) {
 	s.path = "./tmp-test"
 
@@ -38,8 +40,9 @@ func (s *ComponentTestSuite) SetUpSuite(c *C) {
 
 	go s.svc.Run()
 }
-func (s *ComponentTestSuite) TearDownSuite(c *C) {
-}
+
+// tear down installed files
+// (leave fixture downloads for future tests)
 func (s *ComponentTestSuite) TearDownTest(c *C) {
 	os.RemoveAll(s.path + "/modules")
 }
@@ -74,7 +77,7 @@ func (s *ComponentTestSuite) TestPublishError(c *C) {
 }
 
 // client should return list releases for a given module
-func (s *ComponentTestSuite) TestGetRelease(c *C) {
+func (s *ComponentTestSuite) TestGetReleaseByModule(c *C) {
 	// given
 	file := s.path + "/puppetlabs-apache-1.5.0.tar.gz"
 	f, _ := os.Open(file)
@@ -82,7 +85,7 @@ func (s *ComponentTestSuite) TestGetRelease(c *C) {
 	loc, _ := s.client.PublishModule(f, "puppetlabs-apache-1.5.0.tar.gz")
 
 	// when
-	resp, err := s.client.GetRelease("puppetlabs", "apache")
+	resp, err := s.client.GetReleaseByModule("puppetlabs", "apache")
 
 	// then
 	c.Assert(err, Equals, nil)
@@ -91,9 +94,9 @@ func (s *ComponentTestSuite) TestGetRelease(c *C) {
 }
 
 // client should return empty array when module not found
-func (s *ComponentTestSuite) TestGetReleaseNotFound(c *C) {
+func (s *ComponentTestSuite) TestGetReleaseByModuleNotFound(c *C) {
 	// when
-	resp, err := s.client.GetRelease("puppetlabs", "apache")
+	resp, err := s.client.GetReleaseByModule("puppetlabs", "apache")
 
 	// then
 	c.Assert(err, Equals, nil)
@@ -101,9 +104,9 @@ func (s *ComponentTestSuite) TestGetReleaseNotFound(c *C) {
 }
 
 // client should return error when searching with invalid module name
-func (s *ComponentTestSuite) TestGetReleaseInvalidModule(c *C) {
+func (s *ComponentTestSuite) TestGetReleaseByModuleInvalidModule(c *C) {
 	// when
-	_, err := s.client.GetRelease("puppetlabs", "apache-foo")
+	_, err := s.client.GetReleaseByModule("puppetlabs", "apache-foo")
 
 	// then
 	c.Assert(err, Not(Equals), nil)
