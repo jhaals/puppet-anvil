@@ -1,2 +1,5 @@
 *.deb
 /go-puppet-forge
+
+build
+tmp-test

@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"archive/tar"
@@ -12,37 +12,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/benschw/puppet-anvil/api"
 )
 
-type Metadata struct {
-	Name         string `json:"name"`
-	Version      string `json:"version"`
-	Author       string `json:"author"`
-	Licence      string `json:"license"`
-	Dependencies []struct {
-		Name               string `json:"name"`
-		VersionRequirement string `json:"version_requirement,omitempty"`
-	} `json:"dependencies"`
-}
-
-type Result struct {
-	Uri      string `json:"uri"`
-	FileUri  string `json:"file_uri"`
-	Version  string `json:"version"`
-	Md5      string `json:"file_md5"`
-	Metadata `json:"metadata"`
-}
-type Pagination struct {
-	Next bool `json:"next"`
-}
-type Response struct {
-	Results    []Result `json:"results"`
-	Pagination `json:"pagination"`
-}
-
 // ListModules returns all tar.gz files
-func ListModules(path string) []Metadata {
-	var result []Metadata
+func ListModules(path string) []api.Metadata {
+	var result []api.Metadata
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Println(err)
@@ -120,8 +96,8 @@ func ExtractMetadata(module os.FileInfo, path string) error {
 	}
 }
 
-func readMetadata(file string) (Metadata, error) {
-	var m Metadata
+func readMetadata(file string) (api.Metadata, error) {
+	var m api.Metadata
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return m, err
