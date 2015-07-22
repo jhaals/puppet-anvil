@@ -17,8 +17,9 @@ example:
 
 ##### Build and run from source
 
-    go build -o puppet-anvil
-    PORT=1337 MODULEPATH=/var/lib/puppet-anvil/modules ./puppet-anvil
+
+	make deps build
+	PORT=1337 MODULEPATH=/var/lib/puppet-anvil/modules ./build/puppet-anvil
 
     Starting Puppet Anvil on port 1337 serving modules from /var/lib/puppet-anvil/modules
 
