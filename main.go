@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/benschw/puppet-anvil/service"
+	"github.com/jhaals/puppet-anvil/service"
 )
 
 func main() {
