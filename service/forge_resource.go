@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/benschw/puppet-anvil/api"
+	"github.com/jhaals/puppet-anvil/api"
 )
 
 // Handlers that implement the Forge API

@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/benschw/puppet-anvil/api"
+	"github.com/jhaals/puppet-anvil/api"
 )
 
 // ListModules returns all tar.gz files

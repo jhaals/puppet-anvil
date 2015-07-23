@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/benschw/puppet-anvil/api"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/jhaals/puppet-anvil/api"
 )
 
 // Create a new AnvilService

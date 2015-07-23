@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/benschw/puppet-anvil/api"
+	"github.com/jhaals/puppet-anvil/api"
 )
 
 // Handlers to help manage private forge
