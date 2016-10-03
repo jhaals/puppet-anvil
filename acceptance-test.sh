@@ -14,10 +14,12 @@ PID=$!
 
 if [ ! -f $ROOT_PATH/puppetlabs-apache-1.5.0.tar.gz 2>&1 >/dev/null ]; then
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.5.0.tar.gz -O $ROOT_PATH/puppetlabs-apache-1.5.0.tar.gz >/dev/null
+	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.10.0.tar.gz -O $ROOT_PATH/puppetlabs-apache-1.10.0.tar.gz >/dev/null
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.3.tar.gz -O $ROOT_PATH/puppetlabs-concat-1.2.3.tar.gz >/dev/null
 	wget -q https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz -O $ROOT_PATH/puppetlabs-stdlib-4.6.0.tar.gz >/dev/null
 fi
 curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-apache-1.5.0.tar.gz -T $ROOT_PATH/puppetlabs-apache-1.5.0.tar.gz >/dev/null
+curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-apache-1.10.0.tar.gz -T $ROOT_PATH/puppetlabs-apache-1.10.0.tar.gz >/dev/null
 curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-concat-1.2.3.tar.gz -T $ROOT_PATH/puppetlabs-concat-1.2.3.tar.gz >/dev/null
 curl -s -X PUT http://localhost:8080/admin/module/puppetlabs-stdlib-4.6.0.tar.gz -T $ROOT_PATH/puppetlabs-stdlib-4.6.0.tar.gz >/dev/null
 

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/as/structslice"
 	"github.com/jhaals/puppet-anvil/api"
-	"github.com/pmylund/sortutil"
 )
 
 // Handlers that implement the Forge API
@@ -131,7 +131,7 @@ func (f *ForgeResource) getModuleResult(user string, mod string) (api.ModuleResu
 	}
 
 	//sort the list of modules and get most recent version
-	sortutil.DescByField(modules, "Version")
+	structslice.SortByName(modules, "Version")
 	v := modules[0].Version
 	n := modules[0].Name
 	m := modules[0]

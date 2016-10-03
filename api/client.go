@@ -69,6 +69,62 @@ func (c *AnvilClient) GetReleaseByModule(user string, module string) (*Response,
 	return entity, err
 }
 
+//get data about a particular user-module
+func (c *AnvilClient) GetModulesByUserModule(user string, module string) (*ModuleResult, error) {
+	var entity *ModuleResult
+
+	url := fmt.Sprintf("http://%s/v3/modules/%s-%s", c.Address, user, module)
+
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return entity, nil
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return entity, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return entity, processErrors(body, resp.StatusCode)
+	}
+	err = json.Unmarshal(body, &entity)
+	return entity, err
+}
+
+//get data about a particular release
+func (c *AnvilClient) GetReleaseByUserModuleVersion(user string, module string, version string) (*Result, error) {
+	var entity *Result
+
+	url := fmt.Sprintf("http://%s/v3/releases/%s-%s-%s", c.Address, user, module, version)
+
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return entity, nil
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return entity, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return entity, processErrors(body, resp.StatusCode)
+	}
+	err = json.Unmarshal(body, &entity)
+	return entity, err
+}
+
 func processErrors(body []byte, code int) error {
 	var e *ErrorResponse
 
