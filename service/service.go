@@ -36,6 +36,9 @@ func (s *AnvilService) Run() error {
 	mr := mux.NewRouter()
 	mr.HandleFunc("/v3/files/{user}/{module}/{fileName}", forge.GetModule).Methods("GET")
 	mr.HandleFunc("/v3/releases", forge.GetReleases).Methods("GET")
+	mr.HandleFunc("/v3/releases/{user-module-version}", forge.GetReleaseInfo).Methods("GET")
+	mr.HandleFunc("/v3/modules", forge.GetModules).Methods("GET")
+	mr.HandleFunc("/v3/modules/{user-module}", forge.GetModuleInfo).Methods("GET")
 	mr.HandleFunc("/admin/module/{fileName}", admin.UpsertFile).Methods("PUT")
 
 	http.Handle("/", handlers.LoggingHandler(os.Stdout, mr))

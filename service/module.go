@@ -41,6 +41,26 @@ func ListModules(path string) []api.Metadata {
 	return result
 }
 
+// Get metadata for a single module
+func GetModuleMetadata(path string, filename string) (api.Metadata, error) {
+	var metadata api.Metadata
+	file, err := os.Stat(filepath.Join(path, filename))
+	if err != nil {
+		log.Println(err)
+		return metadata, err
+	}
+
+	err = ExtractMetadata(file, path)
+	if err != nil {
+		log.Println(err)
+	}
+	metadata, err = readMetadata(filepath.Join(path, file.Name()+".metadata"))
+	if err != nil {
+		log.Println(err)
+	}
+	return metadata, err
+}
+
 //Extract metadata from module
 func ExtractMetadata(module os.FileInfo, path string) error {
 	moduleFile := filepath.Join(path, module.Name())
