@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"sort"
 
-	"github.com/as/structslice"
+	"github.com/hashicorp/go-version"
 	"github.com/jhaals/puppet-anvil/api"
 )
 
@@ -14,6 +15,40 @@ import (
 // https://forgeapi.puppetlabs.com/
 type ForgeResource struct {
 	ModulePath string
+}
+
+//methods so we can use the sort.Interface for api.Release
+//using hashicorp/go-version for the sorting algorithm
+//perhaps there's a better way to do this, but this seems to work
+type ByReleaseVersion []api.Release
+
+func (slice ByReleaseVersion) Len() int {
+	return len(slice)
+}
+func (slice ByReleaseVersion) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+func (slice ByReleaseVersion) Less(i, j int) bool {
+	v1, _ := version.NewVersion(slice[i].Version)
+	v2, _ := version.NewVersion(slice[j].Version)
+	return v1.LessThan(v2)
+}
+
+//methods so we can use the sort.Interface for api.Metadata
+//using hashicorp/go-version for the sorting algorithm
+//perhaps there's a better way to do this, but this seems to work
+type ByMetadataVersion []api.Metadata
+
+func (slice ByMetadataVersion) Len() int {
+	return len(slice)
+}
+func (slice ByMetadataVersion) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+func (slice ByMetadataVersion) Less(i, j int) bool {
+	v1, _ := version.NewVersion(slice[i].Version)
+	v2, _ := version.NewVersion(slice[j].Version)
+	return v1.LessThan(v2)
 }
 
 // Serve up module archive
@@ -130,14 +165,14 @@ func (f *ForgeResource) getModuleResult(user string, mod string) (api.ModuleResu
 		return result, err
 	}
 
-	//sort the list of modules and get most recent version
-	structslice.SortByName(modules, "Version")
-	v := modules[0].Version
-	n := modules[0].Name
-	m := modules[0]
+	//gets metadata for most recent release
+	current := f.sortMetaDataByVersion(modules)
+	currentVersion := current[0].Version
+	currentName := current[0].Name
+	currentMetadata := current[0]
 
 	//get path and md5 of most recent version
-	path := filepath.Join(user, mod, user+"-"+mod+"-"+v+".tar.gz")
+	path := filepath.Join(user, mod, user+"-"+mod+"-"+currentVersion+".tar.gz")
 	checksum, err := Checksum(filepath.Join(f.ModulePath, path))
 	if err != nil {
 		log.Println(err)
@@ -153,23 +188,28 @@ func (f *ForgeResource) getModuleResult(user string, mod string) (api.ModuleResu
 		}
 	}
 
+	//sorts the releases in descending order
+	//even though there is a "CurrentRelease" object, it appears that some clients
+	//(like librarian-puppet) use the first release in the releases object as the "Current Release"
+	sr := f.sortReleasesByVersion(releases)
+
 	return api.ModuleResult{
-		Uri:      fmt.Sprintf("/v3/modules/%s", n),
+		Uri:      fmt.Sprintf("/v3/modules/%s", currentName),
 		Slug:     user + "-" + mod,
-		Name:     n,
+		Name:     currentName,
 		FileUri:  fmt.Sprintf("/v3/files/%s", path),
-		Version:  v,
+		Version:  currentVersion,
 		Md5:      checksum,
-		Releases: releases,
+		Releases: sr,
 		Owner: api.Owner{
 			Uri:      fmt.Sprintf("/v3/users/%s", user),
 			Slug:     user,
 			Username: user,
 		},
 		CurrentRelease: api.CurrentRelease{
-			Uri:      fmt.Sprintf("/v3/releases/%s-%s-%s", user, mod, v),
-			Slug:     user + "-" + mod + "-" + v,
-			Metadata: m,
+			Uri:      fmt.Sprintf("/v3/releases/%s-%s-%s", user, mod, currentVersion),
+			Slug:     user + "-" + mod + "-" + currentVersion,
+			Metadata: currentMetadata,
 			ModuleAbbreviated: api.ModuleAbbreviated{
 				Uri:  fmt.Sprintf("/v3/users/%s", user),
 				Slug: user + "-" + mod,
@@ -191,6 +231,18 @@ func (f *ForgeResource) getReleaseFromMetaData(metadata api.Metadata, path strin
 		Version: metadata.Version,
 		Slug:    metadata.Name + "-" + metadata.Version,
 	}, nil
+}
+
+//sorts []api.Release in descending order
+func (f *ForgeResource) sortReleasesByVersion(releases []api.Release) []api.Release {
+	sort.Sort(sort.Reverse(ByReleaseVersion(releases)))
+	return releases
+}
+
+//sorts []api.Metadata in descending order
+func (f *ForgeResource) sortMetaDataByVersion(metadata []api.Metadata) []api.Metadata {
+	sort.Sort(sort.Reverse(ByMetadataVersion(metadata)))
+	return metadata
 }
 
 // Get information about a given release
