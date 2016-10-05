@@ -31,6 +31,7 @@ func (s *ComponentTestSuite) SetUpSuite(c *C) {
 	if _, err := os.Stat(s.path + "/puppetlabs-apache-1.5.0.tar.gz"); err != nil {
 		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.5.0.tar.gz", s.path+"/puppetlabs-apache-1.5.0.tar.gz")
 		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.10.0.tar.gz", s.path+"/puppetlabs-apache-1.10.0.tar.gz")
+		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.0.0.tar.gz", s.path+"/puppetlabs-apache-1.0.0.tar.gz")
 		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.3.tar.gz", s.path+"/puppetlabs-concat-1.2.3.tar.gz")
 		dl("https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.6.0.tar.gz", s.path+"/puppetlabs-stdlib-4.6.0.tar.gz")
 	}
@@ -177,23 +178,27 @@ func (s *ComponentTestSuite) TestGetReleaseByUserModuleVersion(c *C) {
 // client should return most recent release
 func (s *ComponentTestSuite) TestGetModulesByUserModuleLatest(c *C) {
 	// given
-	file1 := s.path + "/puppetlabs-apache-1.5.0.tar.gz"
+	file1 := s.path + "/puppetlabs-apache-1.0.0.tar.gz"
 	f1, _ := os.Open(file1)
 	defer f1.Close()
-	loc1, _ := s.client.PublishModule(f1, "puppetlabs-apache-1.5.0.tar.gz")
+	s.client.PublishModule(f1, "puppetlabs-apache-1.0.0.tar.gz")
 
-	file2 := s.path + "/puppetlabs-apache-1.10.0.tar.gz"
+	file2 := s.path + "/puppetlabs-apache-1.5.0.tar.gz"
 	f2, _ := os.Open(file2)
 	defer f2.Close()
-	loc2, _ := s.client.PublishModule(f2, "puppetlabs-apache-1.10.0.tar.gz")
+	s.client.PublishModule(f2, "puppetlabs-apache-1.5.0.tar.gz")
+
+	file3 := s.path + "/puppetlabs-apache-1.10.0.tar.gz"
+	f3, _ := os.Open(file3)
+	defer f3.Close()
+	loc3, _ := s.client.PublishModule(f3, "puppetlabs-apache-1.10.0.tar.gz")
 
 	// when
 	resp, err := s.client.GetModulesByUserModule("puppetlabs", "apache")
 
 	// then
 	c.Assert(err, Equals, nil)
-	c.Assert(resp.Releases[0].FileUri, Equals, loc2)
-	c.Assert(resp.Releases[0].Version, Equals, "1.10.0")
-	c.Assert(resp.Releases[1].FileUri, Equals, loc1)
-	c.Assert(resp.Releases[1].Version, Equals, "1.5.0")
+	c.Assert(resp.FileUri, Equals, loc3)
+	c.Assert(resp.Version, Equals, "1.10.0")
+	c.Assert(resp.CurrentRelease.Metadata.Version, Equals, "1.10.0")
 }
